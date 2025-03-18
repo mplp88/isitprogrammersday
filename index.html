@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Día del Programador</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id="titulo"></h1>
+    <p id="resultado"></p>
+
+    <script>
+      function obtenerIdioma() {
+        return navigator.language || navigator.userLanguage;
+      }
+
+      function calcularDiaDelProgramador() {
+        const hoy = new Date();
+        const año = hoy.getFullYear();
+        const diaProgramador = new Date(año, 0, 256); // Día 256 del año
+        const idioma = obtenerIdioma().startsWith('es') ? 'es' : 'en';
+
+        const mensajes = {
+          es: {
+            titulo: '¿Es el Día del Programador?',
+            si: '¡Sí! Hoy es el Día del Programador 🎉',
+            no: 'No, faltan {d} días para el Día del Programador.'
+          },
+          en: {
+            titulo: "Is it Programmer's Day?",
+            si: "Yes! Today is Programmer's Day 🎉",
+            no: "No, there are {d} days left until Programmer's Day."
+          }
+        };
+
+        document.getElementById('titulo').innerText = mensajes[idioma].titulo;
+
+        if (hoy.toDateString() === diaProgramador.toDateString()) {
+          document.getElementById('resultado').innerText = mensajes[idioma].si;
+        } else {
+          const diferencia = Math.ceil(
+            (diaProgramador - hoy) / (1000 * 60 * 60 * 24)
+          );
+          document.getElementById('resultado').innerText = mensajes[
+            idioma
+          ].no.replace('{d}', diferencia);
+        }
+      }
+
+      calcularDiaDelProgramador();
+    </script>
+  </body>
+</html>
