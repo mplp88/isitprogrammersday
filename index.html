@@ -17,10 +17,10 @@
       content="Calculate if today is Programmer's Day and how many days are left."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://isitprogrammersday.vercel.app/" />
+    <meta property="og:url" content="https://programmersday.martinponce.com.ar/" />
     <meta
       property="og:image"
-      content="https://isitprogrammersday.vercel.app/programmersday.jpg"
+      content="https://programmersday.martinponce.com.ar/programmersday.jpg"
     />
     <meta
       name="google-site-verification"
@@ -58,47 +58,46 @@
         document.getElementById('lang').value = lang;
         return lang;
       }
-
       function changeLanguage() {
-        const idiomaSeleccionado = document.getElementById('lang').value;
-        localStorage.setItem('lang', idiomaSeleccionado);
-        calcProgrammersDays(idiomaSeleccionado);
+        const selectedLanguage = document.getElementById('lang').value;
+        localStorage.setItem('lang', selectedLanguage);
+        updateProgrammersDay();
       }
-
-      function calcProgrammersDays() {
+      function updateProgrammersDay() {
         const today = new Date();
-        const year = today.getFullYear();
-        const programmersDay = new Date(year, 0, 256); // Día 256 del año
+        const currentYear = today.getFullYear();
+        // Programmer's Day is the 256th day of the year.
+        // If it has already passed this year, use next year's date.
+        let programmersDay = new Date(currentYear, 0, 256);
+        if (today > programmersDay) {
+          programmersDay = new Date(currentYear + 1, 0, 256);
+        }
         const lang = getLanguage().startsWith('es') ? 'es' : 'en';
-
         const messages = {
           es: {
             title: '¿Es el Día del Programador?',
             yes: '¡Sí! Hoy es el Día del Programador 🎉',
-            no: 'No, faltan {d} días para el Día del Programador.'
+            no: 'No, faltan {d} días para el Día del Programador.',
           },
           en: {
             title: "Is it Programmer's Day?",
             yes: "Yes! Today is Programmer's Day 🎉",
-            no: "No, there are {d} days left until Programmer's Day."
-          }
+            no: "No, there are {d} days left until Programmer's Day.",
+          },
         };
-
         document.getElementById('titulo').innerText = messages[lang].title;
-
         if (today.toDateString() === programmersDay.toDateString()) {
           document.getElementById('resultado').innerText = messages[lang].yes;
-        } else {
-          const difference = Math.ceil(
-            (programmersDay - today) / (1000 * 60 * 60 * 24)
-          );
-          document.getElementById('resultado').innerText = messages[
-            lang
-          ].no.replace('{d}', difference);
+          return;
         }
+        const difference = Math.ceil(
+          (programmersDay - today) / (1000 * 60 * 60 * 24),
+        );
+        document.getElementById('resultado').innerText = messages[
+          lang
+        ].no.replace('{d}', difference);
       }
-
-      calcProgrammersDays();
+      updateProgrammersDay();
     </script>
   </body>
 </html>
