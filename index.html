@@ -58,45 +58,87 @@
         document.getElementById('lang').value = lang;
         return lang;
       }
+
       function changeLanguage() {
         const selectedLanguage = document.getElementById('lang').value;
         localStorage.setItem('lang', selectedLanguage);
         updateProgrammersDay();
       }
+
       function updateProgrammersDay() {
         const today = new Date();
         const currentYear = today.getFullYear();
-        // Programmer's Day is the 256th day of the year.
-        // If it has already passed this year, use next year's date.
-        let programmersDay = new Date(currentYear, 0, 256);
-        if (today > programmersDay) {
-          programmersDay = new Date(currentYear + 1, 0, 256);
-        }
+        const programmersDayThisYear = new Date(currentYear, 0, 256);
         const lang = getLanguage().startsWith('es') ? 'es' : 'en';
         const messages = {
           es: {
             title: '¿Es el Día del Programador?',
             yes: '¡Sí! Hoy es el Día del Programador 🎉',
             no: 'No, faltan {d} días para el Día del Programador.',
+            missed:
+              'Fue hace {d} días... y seguro te olvidaste de saludar a tu amigo programador 😔',
+            missedSingle:
+              'Fue ayer... y seguro te olvidaste de saludar a tu amigo programador 😔',
           },
           en: {
             title: "Is it Programmer's Day?",
             yes: "Yes! Today is Programmer's Day 🎉",
             no: "No, there are {d} days left until Programmer's Day.",
+            missed:
+              "It was {d} days ago... and you probably forgot to wish your programmer friend a happy Programmer's Day 😔",
+            missedSingle:
+              "It was yesterday... and you probably forgot to wish your programmer friend a happy Programmer's Day 😔",
           },
         };
+
         document.getElementById('titulo').innerText = messages[lang].title;
-        if (today.toDateString() === programmersDay.toDateString()) {
+
+        // Programmer's Day is today
+        if (today.toDateString() === programmersDayThisYear.toDateString()) {
           document.getElementById('resultado').innerText = messages[lang].yes;
           return;
         }
-        const difference = Math.ceil(
-          (programmersDay - today) / (1000 * 60 * 60 * 24),
+
+        // Programmer's Day already happened this year
+        if (today > programmersDayThisYear) {
+          const daysSince = Math.floor(
+            (today - programmersDayThisYear) / (1000 * 60 * 60 * 24),
+          );
+
+          if (daysSince === 1) {
+            document.getElementById('resultado').innerText =
+              messages[lang].missedSingle;
+            return;
+          }
+
+          if (daysSince <= 15) {
+            document.getElementById('resultado').innerText = messages[
+              lang
+            ].missed.replace('{d}', daysSince);
+            return;
+          }
+
+          // More than 15 days have passed: calculate next Programmer's Day
+          const nextProgrammersDay = new Date(currentYear + 1, 0, 256);
+          const daysUntilNext = Math.ceil(
+            (nextProgrammersDay - today) / (1000 * 60 * 60 * 24),
+          );
+          document.getElementById('resultado').innerText = messages[
+            lang
+          ].no.replace('{d}', daysUntilNext);
+          return;
+        }
+
+        // Programmer's Day hasn't happened yet this year
+        const daysUntil = Math.ceil(
+          (programmersDayThisYear - today) / (1000 * 60 * 60 * 24),
         );
+
         document.getElementById('resultado').innerText = messages[
           lang
-        ].no.replace('{d}', difference);
+        ].no.replace('{d}', daysUntil);
       }
+
       updateProgrammersDay();
     </script>
   </body>
